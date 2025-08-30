@@ -29,4 +29,9 @@ class ProductController {
                 .map(ResponseEntity::ok) // 200 + product
                 .orElseThrow(() -> ProductNotFoundException.forCode(code)); // 404
     }
+
+    @GetMapping("/health-check")
+    String healthCheck() {
+        return "Catalog Service is up and running";
+    }
 }
