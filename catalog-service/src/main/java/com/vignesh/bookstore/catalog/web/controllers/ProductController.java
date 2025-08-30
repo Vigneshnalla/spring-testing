@@ -32,6 +32,6 @@ class ProductController {
 
     @GetMapping("/health-check")
     String healthCheck() {
-        return "Catalog Service is up and running";
+        return "Catalog Service is up and running sucessfully";
     }
 }
