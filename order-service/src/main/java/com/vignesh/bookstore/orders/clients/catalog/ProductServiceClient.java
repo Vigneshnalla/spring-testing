@@ -1,35 +1,34 @@
 package com.vignesh.bookstore.orders.clients.catalog;
 
-
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import java.util.Optional;
-
 @Component
 public class ProductServiceClient {
-    private static final Logger logger = LoggerFactory.getLogger(ProductServiceClient.class);
+    private static final Logger log = LoggerFactory.getLogger(ProductServiceClient.class);
 
     private final RestClient restClient;
 
-    public ProductServiceClient(RestClient restClient) {
+    ProductServiceClient(RestClient restClient) {
         this.restClient = restClient;
     }
 
-    public Optional<Product> getProductByCode(String productCode) {
-        logger.info("fetching product for code: {}", productCode);
+    @CircuitBreaker(name = "catalog-service", fallbackMethod = "getProductByCodeFallback")
+    @Retry(name = "catalog-service", fallbackMethod = "getProductByCodeFallback")
+    public Optional<Product> getProductByCode(String code) {
+        log.info("Fetching product for code: {}", code);
+        var product =
+                restClient.get().uri("/api/products/{code}", code).retrieve().body(Product.class);
+        return Optional.ofNullable(product);
+    }
 
-        try {
-            Product product = restClient.get()
-                    .uri("/api/products/{code}", productCode)
-                    .retrieve()
-                    .body(Product.class);
-            return Optional.ofNullable(product);
-        } catch (Exception e) {
-            logger.error("Error fetching product with code {}: {}", productCode, e.getMessage());
-            return Optional.empty();
-        }
+    Optional<Product> getProductByCodeFallback(String code, Throwable t) {
+        log.info("catalog-service get product by code fallback: code:{}, Error: {} ", code, t.getMessage());
+        return Optional.empty();
     }
 }

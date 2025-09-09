@@ -1,11 +1,8 @@
 package com.vignesh.bookstore.orders.web.controllers;
 
-
-
 import static com.vignesh.bookstore.orders.testdata.TestDataFactory.createOrderRequestWithInvalidCustomer;
 import static com.vignesh.bookstore.orders.testdata.TestDataFactory.createOrderRequestWithInvalidDeliveryAddress;
 import static com.vignesh.bookstore.orders.testdata.TestDataFactory.createOrderRequestWithNoItems;
-
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,14 +26,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-
 @WebMvcTest(OrderController.class)
 class OrderControllerUnitTest {
     @MockitoBean
     private OrderService orderService;
 
     @MockitoBean
-    private SecurityService securityService;  // it is going to be mocked by default
+    private SecurityService securityService; // it is going to be mocked by default
 
     @Autowired
     private MockMvc mockMvc;
@@ -51,7 +47,7 @@ class OrderControllerUnitTest {
 
     @ParameterizedTest(name = "[{index}]-{0}")
     @MethodSource("createOrderRequestProvider")
-    void shouldReturnBadRequestWhenOrderPayloadIsInvalid(CreateOrderRequest request) throws Exception{
+    void shouldReturnBadRequestWhenOrderPayloadIsInvalid(CreateOrderRequest request) throws Exception {
         given(orderService.createOrder(eq("siva"), any(CreateOrderRequest.class)))
                 .willReturn(null);
 

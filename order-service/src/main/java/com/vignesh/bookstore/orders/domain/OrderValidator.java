@@ -1,6 +1,5 @@
 package com.vignesh.bookstore.orders.domain;
 
-
 import com.vignesh.bookstore.orders.clients.catalog.Product;
 import com.vignesh.bookstore.orders.clients.catalog.ProductServiceClient;
 import com.vignesh.bookstore.orders.domain.models.CreateOrderRequest;

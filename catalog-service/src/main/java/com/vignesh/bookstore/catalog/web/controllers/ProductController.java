@@ -24,6 +24,7 @@ class ProductController {
 
     @GetMapping("/{code}")
     ResponseEntity<Product> getProducts(@PathVariable String code) {
+
         return productService
                 .getProductByCode(code)
                 .map(ResponseEntity::ok) // 200 + product
@@ -33,5 +34,13 @@ class ProductController {
     @GetMapping("/health-check")
     String healthCheck() {
         return "Catalog Service is up and running sucessfully";
+    }
+
+    void sleep() {
+        try {
+            Thread.sleep(6000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

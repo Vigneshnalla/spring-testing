@@ -1,24 +1,36 @@
 package com.vignesh.bookstore.orders.web.controllers;
 
-import com.vignesh.bookstore.orders.AbstractIT;
-import com.vignesh.bookstore.orders.testdata.TestDataFactory;
-import io.restassured.http.ContentType;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.vignesh.bookstore.orders.AbstractIT;
+import com.vignesh.bookstore.orders.domain.models.OrderSummary;
+import com.vignesh.bookstore.orders.testdata.TestDataFactory;
+import io.restassured.common.mapper.TypeRef;
+import io.restassured.http.ContentType;
+import java.math.BigDecimal;
+import java.util.List;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.context.jdbc.Sql;
+
+@Sql(scripts = "classpath:test-orders.sql")
 class OrderControllerTests extends AbstractIT {
 
     @Nested
     class CreateOrderTests {
         @Test
         void shouldCreateOrderSuccessfully() {
-            var payload = """
-                    
+
+            mockGetProductByCode("P100", "Product 1", new BigDecimal("25.50"));
+
+            var payload =
+                    """
+
                                              {
                                                  "customer" : {
                                                      "name": "Siva",
@@ -44,8 +56,7 @@ class OrderControllerTests extends AbstractIT {
                                              }
                     """;
 
-            given()
-                    .contentType(ContentType.JSON)
+            given().contentType(ContentType.JSON)
                     .body(payload)
                     .when()
                     .post("/api/orders")
@@ -59,7 +70,7 @@ class OrderControllerTests extends AbstractIT {
     void shouldReturnBadRequestWhenMandatoryDataIsMissing() {
         var payload = TestDataFactory.createOrderRequestWithInvalidCustomer();
         given().contentType(ContentType.JSON)
-//                .header("Authorization", "Bearer " + getToken())
+                //                .header("Authorization", "Bearer " + getToken())
                 .body(payload)
                 .when()
                 .post("/api/orders")
@@ -67,5 +78,45 @@ class OrderControllerTests extends AbstractIT {
                 .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
+    @Nested
+    class GetOdersTests {
+        @Test
+        void shouldGetOrdersSuccessfully() {
 
+            List<OrderSummary> orderSummaryList = given().when()
+                    .get("/api/orders")
+                    .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .extract()
+                    .body()
+                    .as(new TypeRef<>() {});
+            System.out.println(orderSummaryList + " orderSummaryList");
+            assertThat(orderSummaryList).hasSize(2);
+        }
+    }
+
+    @Nested
+    class GetOrderByOrderNumberTests {
+        @Test
+        void shouldGetOrdersSuccessfully() {
+            String orderNumber = "order-123";
+
+            var orderResponse = given().when()
+                    .get("/api/orders/{orderNumber}", orderNumber)
+                    .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .body("orderNumber", is(orderNumber))
+                    .body("items.size()", is(2));
+        }
+
+        @Test
+        void shouldReturnNotFoundForInvalidOrderNumber() {
+            String orderNumber = "INVALID-ORDER-NUMBER";
+
+            given().when()
+                    .get("/api/orders/{orderNumber}", orderNumber)
+                    .then()
+                    .statusCode(HttpStatus.NOT_FOUND.value());
+        }
+    }
 }

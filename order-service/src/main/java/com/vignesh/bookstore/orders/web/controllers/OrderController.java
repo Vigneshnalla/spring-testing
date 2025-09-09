@@ -1,20 +1,22 @@
 package com.vignesh.bookstore.orders.web.controllers;
 
-
+import com.vignesh.bookstore.orders.domain.OrderNotFoundException;
 import com.vignesh.bookstore.orders.domain.OrderService;
 import com.vignesh.bookstore.orders.domain.SecurityService;
 import com.vignesh.bookstore.orders.domain.models.CreateOrderRequest;
 import com.vignesh.bookstore.orders.domain.models.CreateOrderResponse;
+import com.vignesh.bookstore.orders.domain.models.OrderDTO;
+import com.vignesh.bookstore.orders.domain.models.OrderSummary;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
 @RequestMapping("/api/orders")
- class OrderController {
+class OrderController {
 
     private static final Logger log = LoggerFactory.getLogger(OrderController.class);
 
@@ -34,5 +36,19 @@ import org.springframework.web.bind.annotation.*;
         return orderService.createOrder(userName, request);
     }
 
+    @GetMapping
+    List<OrderSummary> getOrders() {
+        String userName = securityService.getLoginUserName();
+        log.info("Fetching orders for user: {}", userName);
+        return orderService.findOrders(userName);
+    }
 
+    @GetMapping("/{orderNumber}")
+    OrderDTO getOrder(@PathVariable String orderNumber) {
+        String userName = securityService.getLoginUserName();
+        log.info("Fetching order details for user: {} and orderNumber: {}", userName, orderNumber);
+        return orderService
+                .findUserOrder(userName, orderNumber)
+                .orElseThrow(() -> new OrderNotFoundException(orderNumber));
+    }
 }

@@ -1,6 +1,5 @@
 package com.vignesh.bookstore.orders.domain.models;
 
-
 public enum OrderStatus {
     NEW,
     IN_PROCESS,

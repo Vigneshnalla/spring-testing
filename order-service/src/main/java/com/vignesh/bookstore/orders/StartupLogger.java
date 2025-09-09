@@ -1,6 +1,5 @@
 package com.vignesh.bookstore.orders;
 
-import com.vignesh.bookstore.orders.ApplicationProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -27,7 +26,8 @@ public class StartupLogger implements CommandLineRunner {
         System.out.println("Error Orders Queue: " + properties.getErrorOrdersQueue());
 
         try {
-            rabbitTemplate.convertAndSend(properties.getOrderEventsExchange(), properties.getNewOrdersQueue(), "Startup test message");
+            rabbitTemplate.convertAndSend(
+                    properties.getOrderEventsExchange(), properties.getNewOrdersQueue(), "Startup test message");
             System.out.println("✅ RabbitMQ connection successful and test message sent!");
         } catch (Exception e) {
             System.err.println("❌ RabbitMQ connection failed: " + e.getMessage());

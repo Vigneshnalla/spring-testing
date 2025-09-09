@@ -1,6 +1,5 @@
 package com.vignesh.bookstore.orders.domain;
 
-
 import org.springframework.stereotype.Component;
 
 @Component

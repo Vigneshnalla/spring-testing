@@ -1,5 +1,6 @@
 package com.vignesh.bookstore.orders.testdata;
 
+import static org.instancio.Select.field;
 
 import com.vignesh.bookstore.orders.domain.models.Address;
 import com.vignesh.bookstore.orders.domain.models.CreateOrderRequest;
@@ -8,9 +9,7 @@ import com.vignesh.bookstore.orders.domain.models.OrderItem;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
-
 import org.instancio.Instancio;
-import static org.instancio.Select.field;
 
 public class TestDataFactory {
     static final List<String> VALID_COUNTIES = List.of("India", "Germany");

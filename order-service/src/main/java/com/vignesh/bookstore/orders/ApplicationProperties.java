@@ -1,8 +1,6 @@
 package com.vignesh.bookstore.orders;
 
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
-
 
 @ConfigurationProperties(prefix = "orders")
 public class ApplicationProperties {
